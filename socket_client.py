@@ -28,10 +28,6 @@ class SocketClient():
                 # 接続先のソケットサーバが立ち上がっていない場合、
                 # 接続拒否になることが多い
                 print('ソケットサーバに接続を拒否されました。')
-                print('ソケットサーバを立ち上げます。')
-                print('Starting....')
-                ss = socket_server.SocketServer()
-                ss.socket_server_up()
 
     def send_message(self, sock):
         while True:

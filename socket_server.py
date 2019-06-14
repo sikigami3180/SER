@@ -1,12 +1,38 @@
 import socket
 import threading
+import signal
+import time
 
+class Timer(threading.Thread):
+
+    def __init__(self,interval,tick):
+        super(Timer,self).__init__()
+
+        self.interval = interval    # タイマー間隔[sec]
+        self.bStop = False          # 外部からタイマー止められたか
+        self.tick = tick
+
+    def stop(self):
+        self.bStop = True
+        print('timer stop')
+
+    def run(self):
+        print('timer run')
+        while True:
+            if self.bStop:
+                break
+            # 何らかのタイマー処理
+            self.tick()
+            #print( 'timer running...')
+            time.sleep(self.interval)
+        print('timer end')
 
 class SocketServer():
     def __init__(self):
         self.host = socket.gethostname()
         self.port = 50007
         self.clients = []
+        self.step=0
 
     def socket_server_up(self):
         # ソケットサーバ作成(IPv4, TCP)
@@ -59,8 +85,22 @@ class SocketServer():
                         client[0].sendto(data, client[1])
                     except ConnectionResetError:
                         break
+    def tick(self):
+        print(self.step)
+        self.step=self.step+1
+        for client in self.clients:
+            try:
+                client[0].sendto('step : {}'.format(self.step).encode(encoding='utf-8'), client[1])
+            except ConnectionResetError:
+                break
+
+
 
 
 if __name__ == "__main__":
     ss = SocketServer()
+    print("hoge")
+    timer = Timer(1,ss.tick)
+    timer.start()
     ss.socket_server_up()
+    
